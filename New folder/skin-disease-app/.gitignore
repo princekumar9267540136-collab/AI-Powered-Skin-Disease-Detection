@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+
+# Temporary uploads and generated files
+uploads/
+public/uploads/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor folders
+.vscode/
+.idea/
+
+# Large model artifacts
+*.h5
+*.keras

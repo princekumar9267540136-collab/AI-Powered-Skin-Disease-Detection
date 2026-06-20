@@ -1,0 +1,138 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Use a common font stack for wider compatibility */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
+
+body {
+    background-color: #f2f2f2;
+    color: #333;
+    line-height: 1.6; /* Improved readability */
+}
+
+/* Container for responsive centering */
+.container {
+    width: 90%;
+    max-width: 1100px; /* Limit max width for large screens */
+    margin: auto;
+}
+
+/* --- Header --- */
+header {
+    background-color: #4CAF50;
+    padding: 15px 0;
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header .logo {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px; /* Slightly increased gap for better spacing */
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: color 0.3s; /* Added smooth transition */
+}
+
+header nav ul li a:hover {
+    color: #e0e0e0; /* Subtle hover effect */
+}
+
+header nav ul li a.active {
+    text-decoration: underline;
+    text-underline-offset: 4px; /* Lift the underline slightly */
+}
+
+/* --- Main Sections --- */
+main {
+    padding: 60px 20px; /* Increased top/bottom padding */
+    text-align: center;
+}
+
+.home-section, .info-section, .detection-section {
+    background: white;
+    padding: 40px; /* Increased padding inside sections */
+    border-radius: 10px; /* Slightly more rounded corners */
+    margin: 30px auto; /* Increased margin */
+    max-width: 600px; /* Increased max width for more content space */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15); /* More prominent shadow */
+}
+
+/* Button Styling */
+.btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 25px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border: none; /* Ensure button has no default border */
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn:hover {
+    background-color: #45a049;
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Detection input */
+input[type="file"] {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc; /* Added visible border */
+    border-radius: 5px;
+    max-width: 100%;
+}
+
+/* Result box */
+#result {
+    margin-top: 30px;
+    background: #eafaea; /* Light green background for result */
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #4CAF50; /* Green border to match theme */
+    text-align: left;
+}
+
+#result h3 {
+    color: #388e3c; /* Darker green text */
+    margin-bottom: 10px;
+}
+
+#predictionText {
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    padding: 20px; /* Increased padding */
+    background-color: #333;
+    color: white;
+    margin-top: 50px;
+}

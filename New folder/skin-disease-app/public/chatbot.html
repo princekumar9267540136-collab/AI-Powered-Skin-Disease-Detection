@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Health Chatbot</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .chatbot-container {
+            max-width: 800px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #f9fafb;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        .bot .message-avatar {
+            background-color: #dbeafe;
+        }
+
+        .user .message-avatar {
+            background-color: #3b82f6;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .bot .message-content {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+
+        .user .message-content {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 12px 3px 12px 12px;
+        }
+
+        .message-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+
+        .bot .message-label {
+            color: #3b82f6;
+        }
+
+        .user .message-label {
+            color: #1e40af;
+            text-align: right;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #9ca3af;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.5;
+            }
+            30% {
+                opacity: 1;
+            }
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            background-color: white;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .send-btn {
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .send-btn:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #6b7280;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">SkinScan AI</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="detect.html">Detect</a></li>
+                    <li><a href="chatbot.html" class="active">Chatbot</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="detection-section" style="max-width: 900px;">
+            <h2>💬 Skin Health Assistant</h2>
+            <p style="margin-bottom: 20px;">Ask me about skin conditions, care tips, prevention, and general wellness advice.</p>
+            
+            <div class="chatbot-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div>
+                            <div class="message-label">Assistant</div>
+                            <div class="message-content">
+                                👋 Hello! I'm your Skin Health Assistant. I can help you with information about:
+                                <br><br>
+                                • <strong>Common conditions:</strong> Acne, eczema, psoriasis, dry skin, fungal infections
+                                <br>• <strong>Prevention:</strong> Sun protection, skincare routines
+                                <br>• <strong>General tips:</strong> Anti-aging, sensitive skin care
+                                <br><br>
+                                Feel free to ask me anything about skin health!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <input 
+                        type="text" 
+                        id="chatInput" 
+                        placeholder="Type your question here..." 
+                        autocomplete="off"
+                    >
+                    <button class="send-btn" id="sendBtn">Send</button>
+                </div>
+
+                <div class="disclaimer">
+                    ⚠️ <strong>Disclaimer:</strong> This chatbot provides general information only and is not a substitute for professional medical advice. Always consult a dermatologist for serious concerns.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 HealthScan AI. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const API_ENDPOINT = '/chat';
+
+        // Focus on input when page loads
+        window.addEventListener('load', () => {
+            chatInput.focus();
+        });
+
+        // Send message on button click
+        sendBtn.addEventListener('click', sendMessage);
+
+        // Send message on Enter key
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Display user message
+            addMessage('user', message);
+            chatInput.value = '';
+            sendBtn.disabled = true;
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div>
+                    <div class="message-label">Assistant</div>
+                    <div class="typing-indicator">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                // Remove typing indicator
+                typingDiv.remove();
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.response) {
+                    addMessage('bot', data.response);
+                } else if (data.error) {
+                    addMessage('bot', `⚠️ Error: ${data.error}`);
+                } else {
+                    addMessage('bot', 'Sorry, I could not process your request. Please try again.');
+                }
+            } catch (error) {
+                // Remove typing indicator
+                typingDiv.remove();
+                console.error('Error:', error);
+                addMessage('bot', `❌ Connection Error: ${error.message}`);
+            }
+
+            sendBtn.disabled = false;
+            chatInput.focus();
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = sender === 'user' ? '👤' : '🤖';
+            const label = sender === 'user' ? 'You' : 'Assistant';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div>
+                    <div class="message-label">${label}</div>
+                    <div class="message-content">${escapeHtml(text)}</div>
+                </div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
+    <style>
+      
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #60a5fa;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --bot-bg: #ffffff;
+            --user-bg: #e0f2fe;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .chat-container {
+            height: 80vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .bot-message {
+            background-color: var(--bot-bg);
+            border-radius: 12px 12px 12px 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            word-wrap: break-word; /* Prevents overflow */
+        }
+
+        .user-message {
+            background-color: var(--user-bg);
+            border-radius: 12px 12px 0 12px;
+            word-wrap: break-word; /* Prevents overflow */
+        }
+
+        .typing-indicator span {
+            background-color: var(--secondary-color);
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .header-icon {
+            background-color: var(--secondary-color);
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* Basic Markdown Styling */
+        .markdown-content a {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+        .markdown-content ul, .markdown-content ol {
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .markdown-content ul {
+            list-style-type: disc;
+        }
+        .markdown-content ol {
+            list-style-type: decimal;
+        }
+        .markdown-content strong {
+            font-weight: 600;
+        }
+        .markdown-content em {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex items-center gap-4">
+            <div class="header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L12 22M2 12L22 12"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-800">skin Companion</h1>
+                <p class="text-sm text-gray-600">Your AI-powered skin information assistant</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 container mx-auto px-4 py-6 flex flex-col">
+        <div class="flex-1 bg-white rounded-lg shadow-sm overflow-hidden flex flex-col">
+            <div id="chatContainer" class="chat-container p-4 space-y-3 flex-1 overflow-y-auto">
+                <div class="bot-message p-4 max-w-[85%]">
+                    <div class="flex items-start gap-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-medium text-blue-600">Health Companion</div>
+                            <div class="markdown-content mt-1 text-gray-700">
+                                <p>"Hey there! I'm here to help with your skincare journey. Do you have any current skin concerns or goals you'd like to chat about?"</p>
+                                <p class="mt-2">I'm not a substitute for professional medical advice, but I can provide general information to help you understand health/skin related topics better.</p>
+                                <p class="mt-2">How can I assist you today?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="typingIndicator" class="hidden px-4 py-2">
+                <div class="flex items-center gap-2">
+                    <div class="typing-indicator flex space-x-1">
+                        <span class="w-2 h-2 rounded-full"></span>
+                        <span class="w-2 h-2 rounded-full"></span>
+                        <span class="w-2 h-2 rounded-full"></span>
+                    </div>
+                    <span class="text-sm text-gray-500">Health Companion is typing...</span>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="flex">
+                    <input
+                        id="userInput"
+                        type="text"
+                        placeholder="Ask about symptoms, conditions, or general health advice..."
+                        class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <button
+                        id="sendButton"
+                        class="px-4 py-2 rounded-r-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    >
+                        Send
+                    </button>
+                </div>
+                <p class="disclaimer mt-2">
+                    Note: This bot provides general health/skin information only. Consult a healthcare professional for medical advice.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4">
+        <div class="container mx-auto px-4 text-center text-sm text-gray-600">
+            <p>© 2023 Health Companion. Not for medical diagnosis or treatment.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chatContainer');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            // Connect to local server API
+            const API_ENDPOINT = '/chat';
+            
+            let chatHistory = [];
+            
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+                
+                addMessage('user', message);
+                
+                userInput.value = '';
+                userInput.disabled = true;
+                sendButton.disabled = true;
+
+                typingIndicator.classList.remove('hidden');
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Call local server endpoint
+                fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    typingIndicator.classList.add('hidden');
+                    if (data.response) {
+                        addMessage('bot', data.response);
+                    } else if (data.error) {
+                        addMessage('bot', `Error: ${data.error}`);
+                    } else {
+                        addMessage('bot', 'Sorry, I could not process your request.');
+                    }
+                })
+                .catch(error => {
+                    typingIndicator.classList.add('hidden');
+                    console.error('Error:', error);
+                    addMessage('bot', `Connection Error: ${error.message}`);
+                })
+                .finally(() => {
+                    userInput.disabled = false;
+                    sendButton.disabled = false;
+                    userInput.focus();
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                });
+            }
+            
+            function addMessage(role, content) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `${role}-message p-4 max-w-[85%] ${role === 'user' ? 'ml-auto' : ''}`;
+                
+                const messageContent = `
+                    <div class="flex items-start gap-2 ${role === 'user' ? 'flex-row-reverse' : ''}">
+                        <div class="w-8 h-8 rounded-full ${role === 'user' ? 'bg-blue-200' : 'bg-blue-100'} flex items-center justify-center">
+                            ${role === 'user' ? `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                            ` : `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
+                                </svg>
+                            `}
+                        </div>
+                        <div>
+                            <div class="font-medium ${role === 'user' ? 'text-blue-700' : 'text-blue-600'}">
+                                ${role === 'user' ? 'You' : 'Health Companion'}
+                            </div>
+                            <div class="mt-1 text-gray-700 markdown-content">${escapeHtml(content)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                messageDiv.innerHTML = messageContent;
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+            
+            sendButton.addEventListener('click', sendMessage);
+            
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            userInput.focus();
+        });
+    </script>
+</body>
+</html>

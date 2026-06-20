@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Disease Detection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">SkinScan AI</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="detect.html" class="active">Detect</a></li>
+                    <li><a href="chatbot.html">chatbot</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="detection-section">
+            <h2>Upload an Image for Detection 🖼️</h2>
+            <p style="margin-bottom: 20px;">Upload a clear, focused image of the skin area for analysis.</p>
+            
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
+                <strong>⚠️ Important Notice:</strong> This AI model was trained on specific medical skin images. 
+                Results from external images (like those from Google or social media) may be less accurate due to differences in lighting, quality, and image composition. 
+                For best results, use high-quality, well-lit photos focused on the skin condition.
+            </div>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <label for="skinImage" style="display: block; font-weight: bold;">Choose Image File:</label>
+                <input type="file" id="skinImage" name="skinImage" accept="image/*" required>
+                <button type="submit" class="btn">Analyze Image</button>
+            </form>
+
+            <div id="result">
+                <h3>Analysis Result:</h3>
+                <p id="predictionText">Ready to analyze. Please upload an image.</p>
+            </div>
+        </section>
+        
+        <section id="imagePreviewContainer" class="detection-section" style="max-width: 300px; padding: 20px; display: none;">
+            <h3>Image Preview</h3>
+            <img id="imagePreview" src="#" alt="Image Preview" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px;">
+        </section>
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2025 HealthScan AI. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const predictionText = document.getElementById('predictionText');
+        const fileInput = document.getElementById('skinImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        
+    // --- Configuration: API Endpoint ---
+    // Use a relative endpoint so the frontend posts to the same origin that served the page.
+    // This avoids hard-coding the host/port and works when the site is served from the Express server.
+    const API_ENDPOINT = '/predict';
+
+        // --- Image Preview Logic ---
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        });
+
+        // --- Form Submission Logic ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = fileInput.files[0];
+            if (!file) {
+                predictionText.textContent = "Please select an image file first.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('skinImage', file);
+            predictionText.innerHTML = "Processing... <span style='color: orange;'>Please wait.</span>";
+
+            try {
+                const response = await fetch(API_ENDPOINT, { 
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error! Status: ${response.status}. Check server logs.`);
+                }
+
+                const data = await response.json();
+                
+                if (data.prediction && data.confidence !== undefined) {
+                    // Display prediction, confidence, and watermark verification
+                    const confidencePercent = (data.confidence * 100).toFixed(2);
+                    const watermarkLabel = data.watermark_verified ? 'Verified' : 'Not Verified';
+                    const watermarkColor = data.watermark_verified ? 'green' : '#999';
+                    
+                    // Check if prediction is uncertain
+                    const isUncertain = data.prediction === 'Uncertain';
+                    const predictionColor = isUncertain ? 'orange' : '#388e3c';
+                    
+                    // Check if confidence is low (might indicate external image issues)
+                    const isLowConfidence = data.confidence < 0.75;
+                    const confidenceWarning = isLowConfidence ? 
+                        '<br><small style="color: #ff9800;">Note: Lower confidence may occur with external images not matching the training data.</small>' : '';
+                    
+                    // Add suggestions if available
+                    let suggestionsHtml = '';
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        const suggestionText = data.suggestions.slice(0, 2).map(s => {
+                            const sourceText = s.source === 'image_analysis' ? ' (analysis)' : '';
+                            return `${s.disease} (${(s.confidence * 100).toFixed(1)}%)${sourceText}`;
+                        }).join(', ');
+                        suggestionsHtml = '<br><small style="color: #666;">Alternative possibilities: ' + suggestionText + '</small>';
+                    }
+                    
+                    predictionText.innerHTML = `
+                        Predicted Condition: <strong style="color: ${predictionColor};">${data.prediction}</strong><br>
+                        Confidence: <strong>${confidencePercent}%</strong><br>
+                        Watermark: <strong style="color: ${watermarkColor};">${watermarkLabel}</strong>
+                        ${confidenceWarning}
+                        ${suggestionsHtml}
+                    `;
+                } else if (data.error) {
+                    // Display server-side errors
+                    predictionText.innerHTML = `<span style='color: red;'>Server Error: ${data.error}</span>`;
+                } else {
+                    predictionText.textContent = "Analysis complete, but no clear result was returned.";
+                }
+                
+            } catch (error) {
+                // Display network or fetch errors
+                predictionText.innerHTML = `<span style='color: red;'>Connection Error: Failed to reach the server at ${API_ENDPOINT}.</span>`;
+                console.error("Fetch Error:", error);
+            }
+        });
+    </script>
+</body>
+</html>

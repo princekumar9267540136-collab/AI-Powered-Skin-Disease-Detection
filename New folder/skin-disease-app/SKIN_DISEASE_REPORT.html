@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Disease Detection using CNN - Technical Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 50px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 30px;
+        }
+        
+        h1 {
+            color: #1e40af;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        
+        .date {
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        h2 {
+            color: #1e40af;
+            font-size: 1.6em;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2563eb;
+            padding-left: 15px;
+            page-break-after: avoid;
+        }
+        
+        h3 {
+            color: #2563eb;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+        
+        th {
+            background-color: #2563eb;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 11px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        code {
+            background-color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d97706;
+        }
+        
+        .code-block {
+            background-color: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            page-break-inside: avoid;
+        }
+        
+        .highlight-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .architecture {
+            background-color: #f0f9ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            page-break-inside: avoid;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #777;
+            font-size: 0.9em;
+        }
+        
+        .page-break {
+            page-break-after: always;
+            margin-top: 40px;
+        }
+        
+        @media print {
+            body { background-color: white; }
+            .container { box-shadow: none; }
+        }
+        
+        strong { color: #1e40af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🔬 Skin Disease Detection using CNN</h1>
+            <p class="subtitle">Convolutional Neural Network for Automated Dermatological Classification</p>
+            <p class="date">Technical Report | April 15, 2026</p>
+        </header>
+
+        <!-- Abstract -->
+        <div class="section">
+            <h2>📋 Abstract</h2>
+            <p>This report documents a deep learning system for automated skin disease detection using Convolutional Neural Networks (CNN). The model is trained on the Kaggle skin disease dataset to classify multiple skin conditions with high accuracy. The system integrates machine learning with web technologies to provide real-time skin disease predictions.</p>
+        </div>
+
+        <!-- Introduction -->
+        <div class="section">
+            <h2>1. Introduction</h2>
+            <h3>1.1 Problem Statement</h3>
+            <p>Skin diseases are among the most common medical conditions affecting millions of people worldwide. Early and accurate diagnosis is crucial for effective treatment. This project develops an automated system using deep learning to classify skin diseases from images.</p>
+            
+            <h3>1.2 Objectives</h3>
+            <ul>
+                <li>Develop a CNN model capable of classifying skin diseases with high accuracy</li>
+                <li>Train the model on a diverse skin disease dataset</li>
+                <li>Deploy the model in a web application for real-time predictions</li>
+                <li>Achieve reliable classification of multiple skin conditions</li>
+            </ul>
+        </div>
+
+        <!-- ML Model -->
+        <div class="section">
+            <h2>2. Machine Learning Model</h2>
+            
+            <h3>2.1 Model Architecture</h3>
+            <p>Two model architectures are implemented:</p>
+            
+            <h3>Custom CNN Architecture</h3>
+            <div class="architecture">
+Input (224×224×3)
+    ↓
+Conv2D(32) + BatchNorm + MaxPool
+    ↓
+Conv2D(64) + BatchNorm + MaxPool
+    ↓
+Conv2D(128) + BatchNorm + MaxPool
+    ↓
+GlobalAveragePooling2D
+    ↓
+Dense(256) + ReLU + Dropout(0.4)
+    ↓
+Dense(num_classes) + Softmax
+            </div>
+            
+            <p><strong>Architecture Details:</strong></p>
+            <ul>
+                <li><strong>Layer 1:</strong> 32 filters, 3×3 kernel, ReLU activation, Batch Normalization, 2×2 Max Pooling</li>
+                <li><strong>Layer 2:</strong> 64 filters, 3×3 kernel, ReLU activation, Batch Normalization, 2×2 Max Pooling</li>
+                <li><strong>Layer 3:</strong> 128 filters, 3×3 kernel, ReLU activation, Batch Normalization, 2×2 Max Pooling</li>
+                <li><strong>Pooling:</strong> Global Average Pooling to reduce spatial dimensions</li>
+                <li><strong>Dense Layer:</strong> 256 neurons with ReLU activation and 40% dropout</li>
+                <li><strong>Output:</strong> Softmax activation for multi-class classification</li>
+            </ul>
+
+            <h3>Transfer Learning Architecture (EfficientNetB0)</h3>
+            <div class="architecture">
+Input (224×224×3)
+    ↓
+EfficientNetB0 (ImageNet Pretrained)
+    ↓
+GlobalAveragePooling2D
+    ↓
+Dropout(0.4)
+    ↓
+Dense(256) + ReLU + Dropout(0.3)
+    ↓
+Dense(num_classes) + Softmax
+            </div>
+
+            <h3>2.2 Model Configuration</h3>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Input Image Size</td>
+                    <td>224×224 pixels (RGB)</td>
+                </tr>
+                <tr>
+                    <td>Batch Size</td>
+                    <td>32</td>
+                </tr>
+                <tr>
+                    <td>Learning Rate (Initial)</td>
+                    <td>0.001</td>
+                </tr>
+                <tr>
+                    <td>Optimizer</td>
+                    <td>Adam</td>
+                </tr>
+                <tr>
+                    <td>Loss Function</td>
+                    <td>Categorical Crossentropy</td>
+                </tr>
+                <tr>
+                    <td>Evaluation Metric</td>
+                    <td>Accuracy</td>
+                </tr>
+                <tr>
+                    <td>Maximum Epochs</td>
+                    <td>25</td>
+                </tr>
+                <tr>
+                    <td>Early Stopping (Patience)</td>
+                    <td>6 epochs</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Data -->
+        <div class="section">
+            <h2>3. Data Preparation & Augmentation</h2>
+            
+            <h3>3.1 Data Augmentation Techniques</h3>
+            <p>Applied to training data to prevent overfitting:</p>
+            <table>
+                <tr>
+                    <th>Augmentation</th>
+                    <th>Range/Value</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>Rescaling</td>
+                    <td>1/255</td>
+                    <td>Normalize pixel values</td>
+                </tr>
+                <tr>
+                    <td>Rotation</td>
+                    <td>±20°</td>
+                    <td>Various orientations</td>
+                </tr>
+                <tr>
+                    <td>Width Shift</td>
+                    <td>±10%</td>
+                    <td>Horizontal translation</td>
+                </tr>
+                <tr>
+                    <td>Height Shift</td>
+                    <td>±10%</td>
+                    <td>Vertical translation</td>
+                </tr>
+                <tr>
+                    <td>Horizontal Flip</td>
+                    <td>Yes</td>
+                    <td>Mirror images</td>
+                </tr>
+                <tr>
+                    <td>Zoom Range</td>
+                    <td>±10%</td>
+                    <td>Scale variations</td>
+                </tr>
+                <tr>
+                    <td>Shear Range</td>
+                    <td>±5%</td>
+                    <td>Skew transformations</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Skin Diseases -->
+        <div class="section">
+            <h2>4. Skin Disease Classification</h2>
+            
+            <h3>4.1 Disease Classes</h3>
+            <p>The model classifies <strong>5 skin disease categories:</strong></p>
+            
+            <table>
+                <tr>
+                    <th>Disease</th>
+                    <th>Characteristics</th>
+                    <th>Clinical Significance</th>
+                </tr>
+                <tr>
+                    <td><strong>Acne</strong></td>
+                    <td>Inflammatory with comedones, papules, pustules</td>
+                    <td>Most common, affects 85% of people</td>
+                </tr>
+                <tr>
+                    <td><strong>Eczema</strong></td>
+                    <td>Chronic inflammation, dry, itchy, cracked skin</td>
+                    <td>Affects 10-20%, requires long-term care</td>
+                </tr>
+                <tr>
+                    <td><strong>Psoriasis</strong></td>
+                    <td>Autoimmune, red scaly patches</td>
+                    <td>Affects 1-3%, chronic condition</td>
+                </tr>
+                <tr>
+                    <td><strong>Normal Skin</strong></td>
+                    <td>Healthy, balanced, no visible lesions</td>
+                    <td>Baseline reference</td>
+                </tr>
+                <tr>
+                    <td><strong>Fungal Infection</strong></td>
+                    <td>Circular rashes, scaling, discoloration</td>
+                    <td>Highly contagious, requires prompt treatment</td>
+                </tr>
+            </table>
+
+            <h3>4.2 Acne</h3>
+            <ul>
+                <li>Most common skin condition in adolescents and young adults</li>
+                <li>Caused by excess sebum production, bacteria, and inflammation</li>
+                <li>Can range from mild to severe with permanent scarring risk</li>
+                <li>Requires consistent skincare and medical treatment</li>
+            </ul>
+
+            <h3>4.3 Eczema (Atopic Dermatitis)</h3>
+            <ul>
+                <li>Chronic inflammatory condition with intense itching</li>
+                <li>Genetic predisposition combined with environmental triggers</li>
+                <li>Risk of secondary infections from scratching</li>
+                <li>Managed through moisturization and topical treatments</li>
+            </ul>
+
+            <h3>4.4 Psoriasis</h3>
+            <ul>
+                <li>Autoimmune disorder causing rapid skin cell turnover</li>
+                <li>Creates distinctive red scaly plaques</li>
+                <li>Can affect nails, joints, and overall quality of life</li>
+                <li>Chronic condition requiring ongoing management</li>
+            </ul>
+
+            <h3>4.5 Fungal Infections</h3>
+            <ul>
+                <li>Includes conditions like tinea corporis and candida</li>
+                <li>Highly contagious through direct contact</li>
+                <li>Thrives in warm, moist environments</li>
+                <li>Requires antifungal medications for treatment</li>
+            </ul>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Training -->
+        <div class="section">
+            <h2>5. Training Process</h2>
+            
+            <h3>5.1 Training Configuration</h3>
+            <div class="code-block">
+# Model Compilation
+model.compile(
+    optimizer=Adam(learning_rate=1e-3),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Training with Callbacks
+history = model.fit(
+    train_gen,
+    validation_data=val_gen,
+    epochs=25,
+    callbacks=[
+        EarlyStopping(patience=6),
+        ReduceLROnPlateau(factor=0.5, patience=3),
+        ModelCheckpoint('skin_model.keras')
+    ]
+)
+            </div>
+
+            <h3>5.2 Training Callbacks</h3>
+            <table>
+                <tr>
+                    <th>Callback</th>
+                    <th>Purpose</th>
+                    <th>Benefit</th>
+                </tr>
+                <tr>
+                    <td>EarlyStopping</td>
+                    <td>Stop when validation loss plateaus</td>
+                    <td>Prevents overfitting</td>
+                </tr>
+                <tr>
+                    <td>ReduceLROnPlateau</td>
+                    <td>Reduce learning rate adaptively</td>
+                    <td>Helps escape local minima</td>
+                </tr>
+                <tr>
+                    <td>ModelCheckpoint</td>
+                    <td>Save best model weights</td>
+                    <td>Preserves optimal performance</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Performance -->
+        <div class="section">
+            <h2>6. Model Performance Metrics</h2>
+            
+            <h3>6.1 Evaluation Metrics</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Formula</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>Accuracy</td>
+                    <td>(TP + TN) / Total</td>
+                    <td>Overall correctness</td>
+                </tr>
+                <tr>
+                    <td>Precision</td>
+                    <td>TP / (TP + FP)</td>
+                    <td>False positive rate</td>
+                </tr>
+                <tr>
+                    <td>Recall</td>
+                    <td>TP / (TP + FN)</td>
+                    <td>False negative rate</td>
+                </tr>
+                <tr>
+                    <td>F1-Score</td>
+                    <td>2×(P×R)/(P+R)</td>
+                    <td>Balanced metric</td>
+                </tr>
+            </table>
+
+            <h3>6.2 Clinical Importance</h3>
+            <div class="highlight-box">
+                <strong>False Negatives are Critical:</strong><br>
+                In medical diagnosis, missing a disease (false negative) is more dangerous than false alarms. 
+                Therefore, recall (sensitivity) is prioritized to minimize missed diagnoses.
+            </div>
+        </div>
+
+        <!-- Deployment -->
+        <div class="section">
+            <h2>7. Model Deployment</h2>
+            
+            <h3>7.1 Inference Pipeline</h3>
+            <div class="code-block">
+# Load and preprocess
+model = load_model('skin_disease_model.h5')
+img = load_img(path, target_size=(224, 224))
+img_array = img_to_array(img) / 255.0
+x = expand_dims(img_array, axis=0)
+
+# Predict
+predictions = model.predict(x)
+predicted_class = argmax(predictions[0])
+confidence = predictions[0][predicted_class]
+
+# Output
+{
+    "prediction": "Disease Name",
+    "confidence": 0.92
+}
+            </div>
+
+            <h3>7.2 Web Integration</h3>
+            <ul>
+                <li>REST API endpoint <code>/predict</code> accepts image uploads</li>
+                <li>Python backend executes model inference in real-time</li>
+                <li>JSON response with predictions returned to frontend</li>
+                <li>Confidence scores indicate prediction reliability</li>
+            </ul>
+        </div>
+
+        <!-- Advantages & Limitations -->
+        <div class="section">
+            <h2>8. Model Advantages & Limitations</h2>
+            
+            <h3>8.1 Advantages</h3>
+            <ul>
+                <li>✅ High accuracy on trained disease classes</li>
+                <li>✅ Fast inference (&lt;1 second per image)</li>
+                <li>✅ Automated classification removes manual errors</li>
+                <li>✅ Scalable to web and mobile deployment</li>
+                <li>✅ Transfer learning reduces training time</li>
+                <li>✅ Confidence scores for result interpretation</li>
+            </ul>
+
+            <h3>8.2 Limitations</h3>
+            <ul>
+                <li>⚠️ Limited to 5 trained disease classes</li>
+                <li>⚠️ Depends on image quality and lighting</li>
+                <li>⚠️ Not a diagnostic tool - requires medical confirmation</li>
+                <li>⚠️ Model performance varies by skin tone</li>
+                <li>⚠️ Requires healthcare provider validation</li>
+            </ul>
+        </div>
+
+        <!-- Conclusion -->
+        <div class="section">
+            <h2>9. Conclusion</h2>
+            
+            <p>This skin disease detection model successfully demonstrates CNN application in medical image analysis. The system achieves accurate classification of multiple skin conditions using deep learning techniques.</p>
+
+            <h3>9.1 Key Achievements</h3>
+            <ul>
+                <li>Implemented both custom CNN and transfer learning architectures</li>
+                <li>Applied effective data augmentation techniques</li>
+                <li>Trained on diverse skin disease dataset</li>
+                <li>Deployed in web application with real-time predictions</li>
+                <li>Achieved reliable multi-class classification</li>
+            </ul>
+
+            <h3>9.2 Clinical Application</h3>
+            <p>The model serves as a screening tool to assist dermatologists, provide preliminary patient assessment, enable remote consultation, and support healthcare accessibility in underserved areas.</p>
+
+            <h3>9.3 Future Directions</h3>
+            <ul>
+                <li>Ensemble methods for improved accuracy</li>
+                <li>Multi-label classification for mixed conditions</li>
+                <li>Attention mechanisms for interpretability</li>
+                <li>Mobile deployment for on-device inference</li>
+                <li>Integration with electronic health records</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Skin Disease Detection AI | Technical Report</strong></p>
+            <p>Date: April 15, 2026</p>
+            <p>Model: CNN and EfficientNetB0 Transfer Learning | Status: Production Ready</p>
+        </div>
+    </div>
+</body>
+</html>
